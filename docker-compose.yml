@@ -17,6 +17,9 @@ services:
       - SECRET_KEY=8a94cefd021ba3a82e8373edc4983d365a9863a5f5db3bed1d5bf1de8c1845c7
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=60
+    volumes:
+      - ./:/usr/src/app:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
   postgres:
     image: postgres
     environment:
