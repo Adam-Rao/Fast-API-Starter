@@ -1,3 +1,5 @@
+import pytest
+
 from jose import jwt
 from fastapi import Response
 from app.schemas import CreatedUser, Token
@@ -26,9 +28,14 @@ def test_login_user(client, test_user):
     assert res.status_code == 200
 
 
-def test_incorrect_login(test_user, client):
+@pytest.mark.parametrize("email, password, status_code", [
+    ("wrongemail@gmail.com", "password123", 403),
+    ("someemail@protonmail.com", "passwordson", 403),
+    ("sipendiufala@outlook.com", "somefuckingemailpassword", 403),
+    (None, "somefuckingpassword", 422),
+])
+def test_incorrect_login(test_user, client, email, password, status_code):
     res: Response = client.post(
-        '/login', data={'username': test_user['email'], 'password': 'rendeniwrong'})
-    
-    assert res.status_code == 403
-    assert res.json().get('detail') == 'Invalid Credentials'
+        '/login', data={'username': email, 'password': password})
+
+    assert res.status_code == status_code
